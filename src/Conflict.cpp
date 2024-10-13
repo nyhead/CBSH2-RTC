@@ -1,5 +1,4 @@
 #include "Conflict.h"
-#include "RectangleReasoning.h"
 #include "MDD.h"
 
 

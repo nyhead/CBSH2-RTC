@@ -36,37 +36,37 @@ bool CBSHeuristic::computeInformedHeuristics(CBSNode& curr, double _time_limit)
 	case heuristics_type::ZERO:
 		h = 0;
 		break;
-	case heuristics_type::CG:
-		buildCardinalConflictGraph(curr, HG, num_of_CGedges);
-		// Minimum Vertex Cover
-		if (curr.parent == nullptr ||  // root node of CBS tree
-		    target_reasoning || corridor_reasoning == corridor_strategy::STC || corridor_reasoning == corridor_strategy::GC ||
-                corridor_reasoning == corridor_strategy::DC || disjoint_splitting) // when we are allowed
-		    // to replan for multiple agents, the incremental method is not correct any longer.
-			h = minimumVertexCover(HG);
-		else
-        {
-		    assert(curr.paths.size() == 1);
-            h = minimumVertexCover(HG, curr.parent->h_val, num_of_agents, num_of_CGedges);
+	// case heuristics_type::CG:
+	// 	buildCardinalConflictGraph(curr, HG, num_of_CGedges);
+	// 	// Minimum Vertex Cover
+	// 	if (curr.parent == nullptr ||  // root node of CBS tree
+	// 	    target_reasoning || corridor_reasoning == corridor_strategy::STC || corridor_reasoning == corridor_strategy::GC ||
+    //             corridor_reasoning == corridor_strategy::DC || disjoint_splitting) // when we are allowed
+	// 	    // to replan for multiple agents, the incremental method is not correct any longer.
+	// 		h = minimumVertexCover(HG);
+	// 	else
+    //     {
+	// 	    assert(curr.paths.size() == 1);
+    //         h = minimumVertexCover(HG, curr.parent->h_val, num_of_agents, num_of_CGedges);
 
-        }
-		break;
-	case heuristics_type::DG:
-		if (!buildDependenceGraph(curr, HG, num_of_CGedges))
-			return false;
-		// Minimum Vertex Cover
-		if (curr.parent == nullptr || // root node of CBS tree
-		    target_reasoning || corridor_reasoning == corridor_strategy::STC || corridor_reasoning == corridor_strategy::GC ||
-		    corridor_reasoning == corridor_strategy::DC || disjoint_splitting) // when we are allowed to replan for multiple agents, the incremental method is not correct any longer.
-			h = minimumVertexCover(HG);
-		else
-			h = minimumVertexCover(HG, curr.parent->h_val, num_of_agents, num_of_CGedges);
-		break;
-	case heuristics_type::WDG:
-		if (!buildWeightedDependencyGraph(curr, HG))
-			return false;
-		h = minimumWeightedVertexCover(HG);
-		break;
+    //     }
+	// 	break;
+	// case heuristics_type::DG:
+	// 	if (!buildDependenceGraph(curr, HG, num_of_CGedges))
+	// 		return false;
+	// 	// Minimum Vertex Cover
+	// 	if (curr.parent == nullptr || // root node of CBS tree
+	// 	    target_reasoning || corridor_reasoning == corridor_strategy::STC || corridor_reasoning == corridor_strategy::GC ||
+	// 	    corridor_reasoning == corridor_strategy::DC || disjoint_splitting) // when we are allowed to replan for multiple agents, the incremental method is not correct any longer.
+	// 		h = minimumVertexCover(HG);
+	// 	else
+	// 		h = minimumVertexCover(HG, curr.parent->h_val, num_of_agents, num_of_CGedges);
+	// 	break;
+	// case heuristics_type::WDG:
+	// 	if (!buildWeightedDependencyGraph(curr, HG))
+	// 		return false;
+	// 	h = minimumWeightedVertexCover(HG);
+	// 	break;
 	}
 	if (h < 0)
 		return false;
@@ -163,22 +163,22 @@ bool CBSHeuristic::buildWeightedDependencyGraph(CBSNode& node, vector<int>& CG)
 			num_memoization++;
 			node.conflictGraph[idx] = got->second;
 		}
-		else if (rectangle_reasoning == rectangle_strategy::RM ||
-                rectangle_reasoning == rectangle_strategy::GR ||
-                rectangle_reasoning == rectangle_strategy::DR ||
-                save_stats)
-		{
-			node.conflictGraph[idx] = solve2Agents(a1, a2, node, false);
-			assert(node.conflictGraph[idx] >= 0);
-			lookupTable[a1][a2][DoubleConstraintsHasher(a1, a2, &node)] = node.conflictGraph[idx];
-		}
+		// else if (rectangle_reasoning == rectangle_strategy::RM ||
+        //         rectangle_reasoning == rectangle_strategy::GR ||
+        //         rectangle_reasoning == rectangle_strategy::DR ||
+        //         save_stats)
+		// {
+		// 	node.conflictGraph[idx] = solve2Agents(a1, a2, node, false);
+		// 	assert(node.conflictGraph[idx] >= 0);
+		// 	lookupTable[a1][a2][DoubleConstraintsHasher(a1, a2, &node)] = node.conflictGraph[idx];
+		// }
 		else
 		{ 
 			bool cardinal = conflict->priority == conflict_priority::CARDINAL;
-			if (!cardinal && !mutex_reasoning) // using merging MDD methods before runing 2-agent instance
-			{
-				cardinal = dependent(a1, a2, node);
-			}
+			// if (!cardinal && !mutex_reasoning) // using merging MDD methods before runing 2-agent instance
+			// {
+			// 	cardinal = dependent(a1, a2, node);
+			// }
 			if (cardinal) // run 2-agent solver only for dependent agents
 			{
 				node.conflictGraph[idx] = solve2Agents(a1, a2, node, cardinal);		
@@ -237,10 +237,10 @@ int CBSHeuristic::solve2Agents(int a1, int a2, const CBSNode& node, bool cardina
 	cbs.setHeuristicType(heuristics_type::CG);
 	cbs.setDisjointSplitting(disjoint_splitting);
 	cbs.setBypass(false); // I guess that bypassing does not help two-agent path finding???
-	cbs.setRectangleReasoning(rectangle_reasoning);
-	cbs.setCorridorReasoning(corridor_reasoning);
-	cbs.setTargetReasoning(target_reasoning);
-	cbs.setMutexReasoning(mutex_reasoning);
+	// cbs.setRectangleReasoning(rectangle_reasoning);
+	// cbs.setCorridorReasoning(corridor_reasoning);
+	// cbs.setTargetReasoning(target_reasoning);
+	// cbs.setMutexReasoning(mutex_reasoning);
 	cbs.setNodeLimit(node_limit);
 
 	double runtime = (double)(clock() - start_time) / CLOCKS_PER_SEC;

@@ -277,58 +277,58 @@ void CBS::classifyConflicts(CBSNode& node)
 			con->priority = conflict_priority::NON;
 		}
 
-		// Corridor reasoning
-		auto corridor = corridor_helper.run(con, paths, node);
-		if (corridor != nullptr)
-		{
-			corridor->priority = con->priority;
-			computePriorityForConflict(*corridor, node);
-			node.conflicts.push_back(corridor);
-			continue;
-		}
+		// // Corridor reasoning
+		// auto corridor = corridor_helper.run(con, paths, node);
+		// if (corridor != nullptr)
+		// {
+		// 	corridor->priority = con->priority;
+		// 	computePriorityForConflict(*corridor, node);
+		// 	node.conflicts.push_back(corridor);
+		// 	continue;
+		// }
 
-		// Target Reasoning
-		if (con->type == conflict_type::TARGET)
-		{
-			computePriorityForConflict(*con, node);
-			node.conflicts.push_back(con);
-			continue;
-		}
+		// // Target Reasoning
+		// if (con->type == conflict_type::TARGET)
+		// {
+		// 	computePriorityForConflict(*con, node);
+		// 	node.conflicts.push_back(con);
+		// 	continue;
+		// }
 
-		// Rectangle reasoning
-		if (rectangle_helper.strategy != rectangle_strategy::NR &&
-			(int) paths[con->a1]->size() > timestep &&
-			(int) paths[con->a2]->size() > timestep && //conflict happens before both agents reach their goal locations
-			type == constraint_type::VERTEX && // vertex conflict
-			con->priority != conflict_priority::CARDINAL) // not caridnal vertex conflict
-		{
-			auto mdd1 = mdd_helper.getMDD(node, a1, paths[a1]->size());
-			auto mdd2 = mdd_helper.getMDD(node, a2, paths[a2]->size());
-			auto rectangle = rectangle_helper.run(paths, timestep, a1, a2, mdd1, mdd2);
-			if (rectangle != nullptr)
-			{
-				computePriorityForConflict(*rectangle, node);
-				node.conflicts.push_back(rectangle);
-				continue;
-			}
-		}
+		// // Rectangle reasoning
+		// if (rectangle_helper.strategy != rectangle_strategy::NR &&
+		// 	(int) paths[con->a1]->size() > timestep &&
+		// 	(int) paths[con->a2]->size() > timestep && //conflict happens before both agents reach their goal locations
+		// 	type == constraint_type::VERTEX && // vertex conflict
+		// 	con->priority != conflict_priority::CARDINAL) // not caridnal vertex conflict
+		// {
+		// 	auto mdd1 = mdd_helper.getMDD(node, a1, paths[a1]->size());
+		// 	auto mdd2 = mdd_helper.getMDD(node, a2, paths[a2]->size());
+		// 	auto rectangle = rectangle_helper.run(paths, timestep, a1, a2, mdd1, mdd2);
+		// 	if (rectangle != nullptr)
+		// 	{
+		// 		computePriorityForConflict(*rectangle, node);
+		// 		node.conflicts.push_back(rectangle);
+		// 		continue;
+		// 	}
+		// }
 
-		// Mutex reasoning
-		if (mutex_reasoning)
-		{
-			// TODO mutex reasoning is per agent pair, don't do duplicated work...
-			auto mdd1 = mdd_helper.getMDD(node, a1, paths[a1]->size());
-			auto mdd2 = mdd_helper.getMDD(node, a2, paths[a2]->size());
+		// // Mutex reasoning
+		// if (mutex_reasoning)
+		// {
+		// 	// TODO mutex reasoning is per agent pair, don't do duplicated work...
+		// 	auto mdd1 = mdd_helper.getMDD(node, a1, paths[a1]->size());
+		// 	auto mdd2 = mdd_helper.getMDD(node, a2, paths[a2]->size());
 
-			auto mutex_conflict = mutex_helper.run(paths, a1, a2, node, mdd1, mdd2);
+		// 	auto mutex_conflict = mutex_helper.run(paths, a1, a2, node, mdd1, mdd2);
 
-			if (mutex_conflict != nullptr && (*mutex_conflict != *con)) // ignore the cases when mutex finds the same vertex constraints
-			{
-				computePriorityForConflict(*mutex_conflict, node);
-				node.conflicts.push_back(mutex_conflict);
-				continue;
-			}
-		}
+		// 	if (mutex_conflict != nullptr && (*mutex_conflict != *con)) // ignore the cases when mutex finds the same vertex constraints
+		// 	{
+		// 		computePriorityForConflict(*mutex_conflict, node);
+		// 		node.conflicts.push_back(mutex_conflict);
+		// 		continue;
+		// 	}
+		// }
 
 		computePriorityForConflict(*con, node);
 		node.conflicts.push_back(con);
@@ -622,7 +622,7 @@ void CBS::saveResults(const string& fileName, const string& instanceName) const
 		  heuristic_helper.runtime_solve_MVC << "," <<
 
 		  runtime_detect_conflicts << "," <<
-		  rectangle_helper.accumulated_runtime << "," << corridor_helper.accumulated_runtime << "," << mutex_helper.accumulated_runtime << "," <<
+		//   rectangle_helper.accumulated_runtime << "," << corridor_helper.accumulated_runtime << "," << mutex_helper.accumulated_runtime << "," <<
 		  mdd_helper.accumulated_runtime << "," << runtime_build_CT << "," << runtime_build_CAT << "," <<
 		  runtime_path_finding << "," << runtime_generate_child << "," <<
 
@@ -729,14 +729,14 @@ string CBS::getSolverName() const
 	case STRATEGY_COUNT:
 		break;
 	}
-	if (rectangle_helper.getName() != "NR")
-		name += "+" + rectangle_helper.getName();
-	if (corridor_helper.getName() != "NC")
-    	name += "+" + corridor_helper.getName();
-	if (target_reasoning)
-		name += "+T";
-	if (mutex_reasoning)
-		name += "+M";
+	// if (rectangle_helper.getName() != "NR")
+	// 	name += "+" + rectangle_helper.getName();
+	// if (corridor_helper.getName() != "NC")
+    // 	name += "+" + corridor_helper.getName();
+	// if (target_reasoning)
+	// 	name += "+T";
+	// if (mutex_reasoning)
+	// 	name += "+M";
 	if (bypass)
 		name += "+BP";
 	name += " with " + search_engines[0]->getName();
@@ -922,23 +922,23 @@ bool CBS::solve(double _time_limit, int _cost_lowerbound, int _cost_upperbound)
 			{
 				child[0]->constraints = curr->conflict->constraint1;
 				child[1]->constraints = curr->conflict->constraint2;
-				if (curr->conflict->type == conflict_type::RECTANGLE && rectangle_helper.strategy == rectangle_strategy::DR)
-				{
-					int i = (bool)(rand() % 2);
-					for (const auto constraint : child[1 - i]->constraints)
-					{
-						child[i]->constraints.emplace_back(get<0>(constraint), get<1>(constraint), get<2>(constraint), get<3>(constraint), 
-																							constraint_type::POSITIVE_BARRIER);
-					}
-				}
-				else if (curr->conflict->type == conflict_type::CORRIDOR && corridor_helper.getStrategy() == corridor_strategy::DC)
-				{
-					int i = (bool)(rand() % 2);
-					assert(child[1 - i]->constraints.size() == 1);
-					auto constraint = child[1 - i]->constraints.front();
-					child[i]->constraints.emplace_back(get<0>(constraint), get<1>(constraint), get<2>(constraint), get<3>(constraint),
-						constraint_type::POSITIVE_RANGE);
-				}
+				// if (curr->conflict->type == conflict_type::RECTANGLE && rectangle_helper.strategy == rectangle_strategy::DR)
+				// {
+				// 	int i = (bool)(rand() % 2);
+				// 	for (const auto constraint : child[1 - i]->constraints)
+				// 	{
+				// 		child[i]->constraints.emplace_back(get<0>(constraint), get<1>(constraint), get<2>(constraint), get<3>(constraint), 
+				// 																			constraint_type::POSITIVE_BARRIER);
+				// 	}
+				// }
+				// else if (curr->conflict->type == conflict_type::CORRIDOR && corridor_helper.getStrategy() == corridor_strategy::DC)
+				// {
+				// 	int i = (bool)(rand() % 2);
+				// 	assert(child[1 - i]->constraints.size() == 1);
+				// 	auto constraint = child[1 - i]->constraints.front();
+				// 	child[i]->constraints.emplace_back(get<0>(constraint), get<1>(constraint), get<2>(constraint), get<3>(constraint),
+				// 		constraint_type::POSITIVE_RANGE);
+				// }
 			}
 
 			if (screen > 1)
@@ -1071,22 +1071,22 @@ CBS::CBS(vector<SingleAgentSolver*>& search_engines,
 		initial_constraints(initial_constraints), paths_found_initially(paths_found_initially),
 		search_engines(search_engines),
 		mdd_helper(initial_constraints, search_engines),
-		rectangle_helper(search_engines[0]->instance),
-		mutex_helper(search_engines[0]->instance, initial_constraints),
-		corridor_helper(search_engines, initial_constraints),
+		// rectangle_helper(search_engines[0]->instance),
+		// mutex_helper(search_engines[0]->instance, initial_constraints),
+		// corridor_helper(search_engines, initial_constraints),
 		heuristic_helper(search_engines.size(), paths, search_engines, initial_constraints, mdd_helper)
 {
 	num_of_agents = (int) search_engines.size();
-	mutex_helper.search_engines = search_engines;
+	// mutex_helper.search_engines = search_engines;
 }
 
 CBS::CBS(const Instance& instance, bool sipp, int screen) :
 		screen(screen), focal_w(1),
 		num_of_agents(instance.getDefaultNumberOfAgents()),
 		mdd_helper(initial_constraints, search_engines),
-		rectangle_helper(instance),
-		mutex_helper(instance, initial_constraints),
-		corridor_helper(search_engines, initial_constraints),
+		// rectangle_helper(instance),
+		// mutex_helper(instance, initial_constraints),
+		// corridor_helper(search_engines, initial_constraints),
 		heuristic_helper(instance.getDefaultNumberOfAgents(), paths, search_engines, initial_constraints, mdd_helper)
 {
 	clock_t t = clock();
@@ -1105,7 +1105,7 @@ CBS::CBS(const Instance& instance, bool sipp, int screen) :
 	}
 	runtime_preprocessing = (double) (clock() - t) / CLOCKS_PER_SEC;
 
-	mutex_helper.search_engines = search_engines;
+	// mutex_helper.search_engines = search_engines;
 
 	if (screen >= 2) // print start and goals
 	{

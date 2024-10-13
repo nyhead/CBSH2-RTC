@@ -1,9 +1,6 @@
 #pragma once
 
 #include "CBSHeuristic.h"
-#include "RectangleReasoning.h"
-#include "CorridorReasoning.h"
-#include "MutexReasoning.h"
 
 class CBS
 {
@@ -48,10 +45,10 @@ public:
 	// set params
 	void setHeuristicType(heuristics_type h) {heuristic_helper.type = h; }
 	void setPrioritizeConflicts(bool p) {PC = p;	heuristic_helper.PC = p; }
-	void setRectangleReasoning(rectangle_strategy r) {rectangle_helper.strategy = r; heuristic_helper.rectangle_reasoning = r; }
-	void setCorridorReasoning(corridor_strategy c) {corridor_helper.setStrategy(c); heuristic_helper.corridor_reasoning = c; }
-	void setTargetReasoning(bool t) {target_reasoning = t; heuristic_helper.target_reasoning = t; }
-	void setMutexReasoning(bool m) {mutex_reasoning = m; heuristic_helper.mutex_reasoning = m; }
+	// void setRectangleReasoning(rectangle_strategy r) {rectangle_helper.strategy = r; heuristic_helper.rectangle_reasoning = r; }
+	// void setCorridorReasoning(corridor_strategy c) {corridor_helper.setStrategy(c); heuristic_helper.corridor_reasoning = c; }
+	// void setTargetReasoning(bool t) {target_reasoning = t; heuristic_helper.target_reasoning = t; }
+	// void setMutexReasoning(bool m) {mutex_reasoning = m; heuristic_helper.mutex_reasoning = m; }
 	void setDisjointSplitting(bool d) {disjoint_splitting = d; heuristic_helper.disjoint_splitting = d; }
 	void setBypass(bool b) { bypass = b; } // 2-agent solver for heuristic calculation does not need bypass strategy.
 	void setNodeLimit(int n) { node_limit = n; }
@@ -85,9 +82,9 @@ private:
 	bool save_stats;
 
 	MDDTable mdd_helper;	
-	RectangleReasoning rectangle_helper;
-	CorridorReasoning corridor_helper;
-	MutexReasoning mutex_helper;
+	// RectangleReasoning rectangle_helper;
+	// CorridorReasoning corridor_helper;
+	// MutexReasoning mutex_helper;
 	CBSHeuristic heuristic_helper;
 
 	pairing_heap< CBSNode*, compare<CBSNode::compare_node> > open_list;

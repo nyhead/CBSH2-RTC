@@ -41,14 +41,14 @@ int main(int argc, char** argv)
 		("warehouseWidth", po::value<int>()->default_value(0), "width of working stations on both sides, for generating instances")
 
 		// params for CBS
-		("heuristics", po::value<string>()->default_value("WDG"), "heuristics for the high-level search (Zero, CG,DG, WDG)")
+		("heuristics", po::value<string>()->default_value("Zero"), "heuristics for the high-level search (Zero, CG,DG, WDG)")
 		("prioritizingConflicts", po::value<bool>()->default_value(true), "conflict priortization. If true, conflictSelection is used as a tie-breaking rule.")
 		("bypass", po::value<bool>()->default_value(true), "Bypass1")
 		("disjointSplitting", po::value<bool>()->default_value(false), "disjoint splitting")
-		("rectangleReasoning", po::value<string>()->default_value("GR"), "rectangle reasoning strategy (None, R, RM, GR, Disjoint)")
-		("corridorReasoning", po::value<string>()->default_value("GC"), " corridor reasoning strategy (None, C, PC, STC, GC, Disjoint")
-		("mutexReasoning", po::value<bool>()->default_value(false), "Using mutex reasoning")
-		("targetReasoning", po::value<bool>()->default_value(true), "Using target reasoning")
+		// ("rectangleReasoning", po::value<string>()->default_value("GR"), "rectangle reasoning strategy (None, R, RM, GR, Disjoint)")
+		// ("corridorReasoning", po::value<string>()->default_value("GC"), " corridor reasoning strategy (None, C, PC, STC, GC, Disjoint")
+		// ("mutexReasoning", po::value<bool>()->default_value(false), "Using mutex reasoning")
+		// ("targetReasoning", po::value<bool>()->default_value(true), "Using target reasoning")
 		("restart", po::value<int>()->default_value(1), "number of restart times (at least 1)")
 		("sipp", po::value<bool>()->default_value(false), "using sipp as the single agent solver")
 		;
@@ -81,41 +81,41 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	rectangle_strategy r;
-	if (vm["rectangleReasoning"].as<string>() == "None")
-		r = rectangle_strategy::NR;  // no rectangle reasoning
-	else if (vm["rectangleReasoning"].as<string>() == "R")
-		r = rectangle_strategy::R;  // rectangle reasoning for entire paths
-	else if (vm["rectangleReasoning"].as<string>() == "RM")
-		r = rectangle_strategy::RM;  // rectangle reasoning for path segments
-    else if (vm["rectangleReasoning"].as<string>() == "GR")
-        r = rectangle_strategy::GR;  // generalized rectangle reasoning
-	else if (vm["rectangleReasoning"].as<string>() == "Disjoint")
-		r = rectangle_strategy::DR; // disjoint rectangle reasoning
-	else
-	{
-		cout << "WRONG rectangle reasoning strategy!" << endl;
-		return -1;
-	}
+	// rectangle_strategy r;
+	// if (vm["rectangleReasoning"].as<string>() == "None")
+	// 	r = rectangle_strategy::NR;  // no rectangle reasoning
+	// else if (vm["rectangleReasoning"].as<string>() == "R")
+	// 	r = rectangle_strategy::R;  // rectangle reasoning for entire paths
+	// else if (vm["rectangleReasoning"].as<string>() == "RM")
+	// 	r = rectangle_strategy::RM;  // rectangle reasoning for path segments
+    // else if (vm["rectangleReasoning"].as<string>() == "GR")
+    //     r = rectangle_strategy::GR;  // generalized rectangle reasoning
+	// else if (vm["rectangleReasoning"].as<string>() == "Disjoint")
+	// 	r = rectangle_strategy::DR; // disjoint rectangle reasoning
+	// else
+	// {
+	// 	cout << "WRONG rectangle reasoning strategy!" << endl;
+	// 	return -1;
+	// }
 
-	corridor_strategy c;
-	if (vm["corridorReasoning"].as<string>() == "None")
-		c = corridor_strategy::NC;  // no corridor reasoning
-	else if (vm["corridorReasoning"].as<string>() == "C")
-		c = corridor_strategy::C;  // corridor reasoning
-    else if (vm["corridorReasoning"].as<string>() == "PC")
-        c = corridor_strategy::PC;  // corridor + pseudo-corridor reasoning
-    else if (vm["corridorReasoning"].as<string>() == "STC")
-        c = corridor_strategy::STC;  // corridor with start-target reasoning
-    else if (vm["corridorReasoning"].as<string>() == "GC")
-        c = corridor_strategy::GC;  // generalized corridor reasoning = corridor with start-target + pseudo-corridor
-	else if (vm["corridorReasoning"].as<string>() == "Disjoint")
-		c = corridor_strategy::DC; // disjoint corridor reasoning
-	else
-	{
-		cout << "WRONG corridor reasoning strategy!" << endl;
-		return -1;
-	}
+	// corridor_strategy c;
+	// if (vm["corridorReasoning"].as<string>() == "None")
+	// 	c = corridor_strategy::NC;  // no corridor reasoning
+	// else if (vm["corridorReasoning"].as<string>() == "C")
+	// 	c = corridor_strategy::C;  // corridor reasoning
+    // else if (vm["corridorReasoning"].as<string>() == "PC")
+    //     c = corridor_strategy::PC;  // corridor + pseudo-corridor reasoning
+    // else if (vm["corridorReasoning"].as<string>() == "STC")
+    //     c = corridor_strategy::STC;  // corridor with start-target reasoning
+    // else if (vm["corridorReasoning"].as<string>() == "GC")
+    //     c = corridor_strategy::GC;  // generalized corridor reasoning = corridor with start-target + pseudo-corridor
+	// else if (vm["corridorReasoning"].as<string>() == "Disjoint")
+	// 	c = corridor_strategy::DC; // disjoint corridor reasoning
+	// else
+	// {
+	// 	cout << "WRONG corridor reasoning strategy!" << endl;
+	// 	return -1;
+	// }
 
 
 	///////////////////////////////////////////////////////////////////////////
@@ -137,11 +137,11 @@ int main(int argc, char** argv)
 	cbs.setPrioritizeConflicts(vm["prioritizingConflicts"].as<bool>());
 	cbs.setDisjointSplitting(vm["disjointSplitting"].as<bool>());
 	cbs.setBypass(vm["bypass"].as<bool>());
-	cbs.setRectangleReasoning(r);
-	cbs.setCorridorReasoning(c);
+	// cbs.setRectangleReasoning(r);
+	// cbs.setCorridorReasoning(c);
 	cbs.setHeuristicType(h);
-	cbs.setTargetReasoning(vm["targetReasoning"].as<bool>());
-	cbs.setMutexReasoning(vm["mutexReasoning"].as<bool>());
+	// cbs.setTargetReasoning(vm["targetReasoning"].as<bool>());
+	// cbs.setMutexReasoning(vm["mutexReasoning"].as<bool>());
 	cbs.setSavingStats(vm["stats"].as<bool>());
 	cbs.setNodeLimit(vm["nodeLimit"].as<int>());
 
